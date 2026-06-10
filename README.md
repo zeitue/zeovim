@@ -1,6 +1,65 @@
-# kickstart.nvim
+# ZeoVim
 
-## Introduction
+A personal Neovim distribution built on top of [kickstart.nvim](https://github.com/nvim-lua/kickstart.nvim).
+Single-file, fully documented, `vim.pack`-managed, no third-party plugin manager.
+
+> Branch model: `master` mirrors pristine upstream kickstart (never hand-edited),
+> `main` is ZeoVim, `first-edition` is the archived pre-remake config.
+> `git diff master..main` shows exactly what ZeoVim adds.
+
+### What ZeoVim adds over kickstart
+
+- **Theme:** Catppuccin, auto-following the OS light/dark setting — latte (light) / macchiato (dark) via `auto-dark-mode.nvim`.
+- **Languages with full LSP:** C/C++ (`clangd`), Go (`gopls`), Rust (`rust_analyzer`),
+  Java (`jdtls`), Python (`pyright`), Ruby (`ruby_lsp`), Perl (`perlnavigator`),
+  JS/TS + Vue (`ts_ls` hybrid + `vue_ls`), HTML (`html`), CSS/SCSS (`cssls` + `somesass_ls`),
+  Clojure (`clojure_lsp`), JSON (`jsonls`), TOML (`taplo`), XML (`lemminx`),
+  Markdown (`marksman`), Assembly x86/ARM/RISC-V (`asm_lsp`).
+- **Common Lisp:** Vlime REPL via `nvlime` (needs SBCL + quicklisp).
+- **Other assembly** (PowerPC, M68k, 68HC11) and the homemade VM: treesitter/syntax highlight only — no LSP exists.
+- **AI assistants** (coexist over MCP):
+  - **Claude Code** (`coder/claudecode.nvim`) under `<leader>c` — runs on your Claude subscription.
+  - **Antigravity / Gemini** (`mceazy2700/antigravity-cli.nvim`) under `<leader>a` — needs the `agy` CLI.
+- **Git UI** (VS Code-style source control) under `<leader>g`: **neogit** (staging tree,
+  commit, push/pull) + **diffview** (changed-files tree, side-by-side diffs, file history).
+  Inline hunks stay on `<leader>h` (gitsigns).
+- **File explorer:** **neo-tree** sidebar — `<leader>e` toggles, `\` reveals the current file.
+- **Carried-over personal options:** `virtualedit=onemore`, `hlsearch` off, no horizontal
+  mouse scroll, no intro splash, left/right movement wraps lines.
+
+### AI keymaps
+
+| Key | Claude (`<leader>c`) | Key | Antigravity/Gemini (`<leader>a`) |
+| :-- | :-- | :-- | :-- |
+| `<leader>cc` | toggle | `<leader>ac` | toggle |
+| `<leader>cf` | focus | `<leader>aa` | ask (n/v) |
+| `<leader>cs` | send selection (v) | `<leader>ar` | resume session |
+| `<leader>cb` | add buffer to context | `<leader>am` | select model |
+| `<leader>cm` | select model | `<leader>ay` | accept diff |
+| `<leader>cy` / `<leader>cn` | accept / deny diff | `<leader>an` | deny diff |
+
+### Git & explorer keymaps
+
+| Key | Git (`<leader>g`) | Key | Other |
+| :-- | :-- | :-- | :-- |
+| `<leader>gg` | status: stage/commit (neogit) | `<leader>e` | toggle file explorer |
+| `<leader>gc` | commit | `\` | reveal file in tree |
+| `<leader>gp` / `<leader>gP` | pull / push | `<leader>h…` | inline hunks (gitsigns) |
+| `<leader>gd` | diff working tree (diffview) | | |
+| `<leader>gf` | current file history | | |
+| `<leader>gx` | close diffview | | |
+
+### Per-language external tools you still need installed
+
+`gcc`/`clang`, `go`, `rustup`, a JDK, `python3`+`npm`, `ruby`, `perl`, SBCL+quicklisp (Common Lisp),
+the `claude` CLI (Claude), and the `agy` CLI (Antigravity). Mason installs the language *servers*;
+these are the underlying toolchains they drive.
+
+---
+
+## Upstream kickstart.nvim reference
+
+The documentation below is from upstream kickstart and still applies to ZeoVim's mechanics.
 
 A starting point for Neovim that is:
 

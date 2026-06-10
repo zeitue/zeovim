@@ -172,6 +172,24 @@ do
   -- See `:help 'confirm'`
   vim.o.confirm = true
 
+  -- Cursor can sit one past the last character
+  vim.o.virtualedit = 'onemore'
+  -- Don't keep search matches highlighted after the search
+  vim.o.hlsearch = false
+  -- Kill horizontal mouse scroll, keep a gentle vertical scroll
+  vim.o.mousescroll = 'ver:6,hor:0'
+  -- No intro/splash screen on startup
+  vim.opt.shortmess:append 'I'
+  -- Let left/right movement wrap across line breaks
+  vim.opt.whichwrap:append {
+    ['<'] = true,
+    ['>'] = true,
+    ['['] = true,
+    [']'] = true,
+    h = true,
+    l = true,
+  }
+
   -- [[ Basic Keymaps ]]
   --  See `:help vim.keymap.set()`
 
@@ -373,6 +391,10 @@ do
       { '<leader>s', group = '[S]earch', mode = { 'n', 'v' } },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } }, -- Enable gitsigns recommended keymaps first
+      { '<leader>c', group = '[C]laude', mode = { 'n', 'v' } },
+      { '<leader>a', group = '[A]ntigravity', mode = { 'n', 'v' } },
+      { '<leader>g', group = '[G]it', mode = { 'n', 'v' } },
+      { '<leader>e', desc = 'File [E]xplorer' },
       { 'gr', group = 'LSP Actions', mode = { 'n' } },
     },
   }
@@ -383,18 +405,35 @@ do
   -- change the command under that to load whatever the name of that colorscheme is.
   --
   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-  vim.pack.add { gh 'folke/tokyonight.nvim' }
-  ---@diagnostic disable-next-line: missing-fields
-  require('tokyonight').setup {
+  -- ZeoVim uses Catppuccin, following the OS light/dark setting:
+  --   light -> latte, dark -> macchiato.
+  vim.pack.add { gh 'catppuccin/nvim' }
+  require('catppuccin').setup {
+    background = { light = 'latte', dark = 'macchiato' },
     styles = {
-      comments = { italic = false }, -- Disable italics in comments
+      comments = {}, -- no italics in comments
     },
   }
 
-  -- Load the colorscheme here.
-  -- Like many other themes, this one has different styles, and you could load
-  -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-  vim.cmd.colorscheme 'tokyonight-night'
+  -- Re-apply catppuccin so it picks the flavour for the current `background`.
+  local function apply_catppuccin() vim.cmd.colorscheme 'catppuccin' end
+  apply_catppuccin()
+
+  -- Follow the OS appearance (macOS / Linux GNOME-KDE-darkman / Windows 10+)
+  -- and flip background + flavour automatically when the system theme changes.
+  vim.pack.add { gh 'f-person/auto-dark-mode.nvim' }
+  require('auto-dark-mode').setup {
+    update_interval = 3000,
+    fallback = 'dark',
+    set_dark_mode = function()
+      vim.o.background = 'dark'
+      apply_catppuccin()
+    end,
+    set_light_mode = function()
+      vim.o.background = 'light'
+      apply_catppuccin()
+    end,
+  }
 
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
@@ -686,18 +725,48 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
-    -- gopls = {},
-    -- pyright = {},
-    -- rust_analyzer = {},
-    --
-    -- Some languages (like typescript) have entire language plugins that can be useful:
-    --    https://github.com/pmizio/typescript-tools.nvim
-    --
-    -- But for many setups, the LSP (`ts_ls`) will work just fine
-    -- ts_ls = {},
+    -- Systems / compiled
+    clangd = {}, -- C / C++
+    gopls = {}, -- Go
+    rust_analyzer = {}, -- Rust
+    jdtls = {}, -- Java (basic; for deep project support add nvim-jdtls later)
 
-    stylua = {}, -- Used to format Lua code
+    -- Scripting / dynamic
+    pyright = {}, -- Python
+    ruby_lsp = {}, -- Ruby
+    perlnavigator = {}, -- Perl
+
+    -- Web: ts_ls runs Vue hybrid mode so it can also handle .vue files
+    ts_ls = {
+      init_options = {
+        plugins = {
+          {
+            name = '@vue/typescript-plugin',
+            location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+            languages = { 'vue' },
+          },
+        },
+      },
+      filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact', 'vue' },
+    },
+    vue_ls = {}, -- Vue (volar)
+    html = {},
+    cssls = {}, -- CSS / SCSS / LESS
+    somesass_ls = {}, -- Better SCSS: nesting, variables
+
+    -- Lisps
+    clojure_lsp = {}, -- Clojure
+    -- Common Lisp has no solid LSP; it uses the Vlime REPL (see Common Lisp section).
+
+    -- Data / markup
+    jsonls = {}, -- JSON
+    taplo = {}, -- TOML
+    lemminx = {}, -- XML
+    marksman = {}, -- Markdown
+
+    -- Assembly: covers x86 / ARM / RISC-V. Other arches (PowerPC, M68k, 68HC11)
+    -- fall back to treesitter/syntax highlight only -- no LSP exists for them.
+    asm_lsp = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
@@ -753,7 +822,8 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
-    -- You can add other tools here that you want Mason to install
+    'stylua', -- Lua formatter (used by conform)
+    -- Add other CLI tools you want Mason to manage here, e.g. 'prettier', 'rustfmt'
   })
 
   require('mason-tool-installer').setup { ensure_installed = ensure_installed }
@@ -898,7 +968,14 @@ do
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
   -- Ensure basic parsers are installed
-  local parsers = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc' }
+  local parsers = {
+    -- core / kickstart defaults
+    'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
+    -- ZeoVim languages
+    'cpp', 'go', 'gomod', 'rust', 'java', 'javascript', 'typescript', 'tsx', 'vue',
+    'python', 'ruby', 'perl', 'clojure', 'commonlisp', 'asm',
+    'css', 'scss', 'json', 'toml', 'xml', 'yaml',
+  }
   require('nvim-treesitter').install(parsers)
 
   ---@param buf integer
@@ -947,7 +1024,117 @@ do
 end
 
 -- ============================================================
--- SECTION 9: OPTIONAL EXAMPLES / NEXT STEPS
+-- SECTION 9: AI ASSISTANTS
+-- Claude Code (Claude subscription) under <leader>c
+-- Antigravity / Gemini (`agy` CLI) under <leader>a  (<leader>g is Git)
+-- Both bridge to the editor over MCP and coexist without conflict.
+-- ============================================================
+do
+  -- Claude Code -- https://github.com/coder/claudecode.nvim
+  vim.pack.add { gh 'coder/claudecode.nvim' }
+  require('claudecode').setup {
+    terminal = {
+      split_side = 'right',
+      split_width_percentage = 0.30,
+      provider = 'auto', -- uses snacks.nvim if present, otherwise a native split
+    },
+  }
+
+  vim.keymap.set('n', '<leader>cc', '<cmd>ClaudeCode<cr>', { desc = 'Claude: toggle' })
+  vim.keymap.set('n', '<leader>cf', '<cmd>ClaudeCodeFocus<cr>', { desc = 'Claude: focus' })
+  vim.keymap.set('n', '<leader>cm', '<cmd>ClaudeCodeSelectModel<cr>', { desc = 'Claude: select model' })
+  vim.keymap.set('n', '<leader>cb', '<cmd>ClaudeCodeAdd %<cr>', { desc = 'Claude: add buffer to context' })
+  vim.keymap.set('v', '<leader>cs', '<cmd>ClaudeCodeSend<cr>', { desc = 'Claude: send selection' })
+  vim.keymap.set('n', '<leader>cy', '<cmd>ClaudeCodeDiffAccept<cr>', { desc = 'Claude: accept diff' })
+  vim.keymap.set('n', '<leader>cn', '<cmd>ClaudeCodeDiffDeny<cr>', { desc = 'Claude: deny diff' })
+
+  -- Antigravity / Gemini -- https://github.com/McEazy2700/antigravity-cli.nvim
+  -- Needs the `agy` CLI on your PATH. plenary is already present via Telescope;
+  -- vim.pack.add de-duplicates so listing it again is harmless.
+  vim.pack.add {
+    gh 'nvim-lua/plenary.nvim',
+    gh 'McEazy2700/antigravity-cli.nvim',
+  }
+  require('antigravity-cli').setup {
+    command = 'agy',
+    terminal = { provider = 'native', position = 'right', size = 80 },
+  }
+
+  vim.keymap.set('n', '<leader>ac', '<cmd>Antigravity<cr>', { desc = 'Antigravity: toggle' })
+  vim.keymap.set({ 'n', 'v' }, '<leader>aa', '<cmd>AntigravityAsk<cr>', { desc = 'Antigravity: ask' })
+  vim.keymap.set('n', '<leader>ar', '<cmd>AntigravityResume<cr>', { desc = 'Antigravity: resume' })
+  vim.keymap.set('n', '<leader>am', '<cmd>AntigravitySelectModel<cr>', { desc = 'Antigravity: select model' })
+  vim.keymap.set('n', '<leader>ay', '<cmd>AntigravityDiffAccept<cr>', { desc = 'Antigravity: accept diff' })
+  vim.keymap.set('n', '<leader>an', '<cmd>AntigravityDiffDeny<cr>', { desc = 'Antigravity: deny diff' })
+end
+
+-- ============================================================
+-- SECTION 10: COMMON LISP (Vlime REPL)
+-- Clojure is covered by clojure_lsp; Common Lisp has no good LSP, so it uses
+-- the classic Slime-style REPL via nvlime. Requires SBCL (or another CL) and
+-- quicklisp on the machine. Open a .lisp file and use the nvlime commands to
+-- start/connect a server -- see `:help nvlime` after first install.
+-- ============================================================
+do
+  vim.pack.add { gh 'monkoose/nvlime' }
+  -- nvlime auto-loads through its ftplugin for `lisp` files; no setup() needed.
+end
+
+-- ============================================================
+-- SECTION 11: FILE EXPLORER (neo-tree)
+-- VS Code-style file tree sidebar. Toggle with <leader>e;
+-- `\` reveals the current file in the tree.
+-- ============================================================
+do
+  local plugins = {
+    { src = gh 'nvim-neo-tree/neo-tree.nvim', version = vim.version.range '*' },
+    gh 'nvim-lua/plenary.nvim',
+    gh 'MunifTanjim/nui.nvim',
+  }
+  if vim.g.have_nerd_font then table.insert(plugins, gh 'nvim-tree/nvim-web-devicons') end
+  vim.pack.add(plugins)
+
+  require('neo-tree').setup {
+    filesystem = {
+      follow_current_file = { enabled = true }, -- highlight the open file in the tree
+      window = { mappings = { ['\\'] = 'close_window' } },
+    },
+  }
+
+  vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<cr>', { desc = 'File [E]xplorer toggle' })
+  vim.keymap.set('n', '\\', '<cmd>Neotree reveal<cr>', { desc = 'Reveal file in Neo-tree', silent = true })
+end
+
+-- ============================================================
+-- SECTION 12: GIT UI (neogit + diffview)
+-- VS Code-style source control under <leader>g:
+--   neogit   = staging tree -- stage/unstage files or hunks, write a commit
+--              message, commit, push/pull, branch.
+--   diffview = changed-files tree with side-by-side diffs and file history.
+-- Inline gutter signs and hunk staging still live on <leader>h (gitsigns).
+-- ============================================================
+do
+  vim.pack.add {
+    gh 'nvim-lua/plenary.nvim',
+    gh 'sindrets/diffview.nvim',
+    gh 'NeogitOrg/neogit',
+  }
+  require('diffview').setup {}
+  require('neogit').setup {
+    integrations = { diffview = true }, -- use diffview for neogit's diffs
+  }
+
+  vim.keymap.set('n', '<leader>gg', '<cmd>Neogit<cr>', { desc = 'Git: status (stage/commit)' })
+  vim.keymap.set('n', '<leader>gc', '<cmd>Neogit commit<cr>', { desc = 'Git: commit' })
+  vim.keymap.set('n', '<leader>gp', '<cmd>Neogit pull<cr>', { desc = 'Git: pull' })
+  vim.keymap.set('n', '<leader>gP', '<cmd>Neogit push<cr>', { desc = 'Git: push' })
+  vim.keymap.set('n', '<leader>gd', '<cmd>DiffviewOpen<cr>', { desc = 'Git: diff working tree' })
+  vim.keymap.set('n', '<leader>gf', '<cmd>DiffviewFileHistory %<cr>', { desc = 'Git: current file history' })
+  vim.keymap.set('n', '<leader>gx', '<cmd>DiffviewClose<cr>', { desc = 'Git: close diffview' })
+end
+
+-- ============================================================
+-- SECTION 13: OPTIONAL EXAMPLES / NEXT STEPS
 -- kickstart.plugins.* examples
 -- ============================================================
 do
