@@ -727,6 +727,7 @@ do
   local servers = {
     -- Systems / compiled
     clangd = {}, -- C / C++
+    neocmake = {}, -- CMake
     gopls = {}, -- Go
     rust_analyzer = {}, -- Rust
     jdtls = {}, -- Java (basic; for deep project support add nvim-jdtls later)
@@ -823,6 +824,8 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     'stylua', -- Lua formatter (used by conform)
+    'clang-format', -- C / C++ formatter (used by conform; reads project .clang-format)
+    'gersemi', -- CMake formatter (used by conform; neocmake's LSP formatter is a no-op)
     -- Add other CLI tools you want Mason to manage here, e.g. 'prettier', 'rustfmt'
   })
 
@@ -846,6 +849,12 @@ do
     format_on_save = function(bufnr)
       -- You can specify filetypes to autoformat on save here:
       local enabled_filetypes = {
+        c = true,
+        cpp = true,
+        objc = true, -- Objective-C (.m)
+        objcpp = true, -- Objective-C++ (.mm)
+        cuda = true, -- CUDA (.cu/.cuh)
+        cmake = true, -- CMake
         -- lua = true,
         -- python = true,
       }
@@ -860,12 +869,31 @@ do
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      c = { 'clang-format' },
+      cpp = { 'clang-format' },
+      objc = { 'clang-format' },
+      objcpp = { 'clang-format' },
+      cuda = { 'clang-format' },
+      cmake = { 'gersemi' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
       -- javascript = { "prettierd", "prettier", stop_after_first = true },
+    },
+    -- Per-formatter tweaks. clang-format already auto-discovers a project's
+    -- .clang-format (walking up from the file); --fallback-style only applies
+    -- when no such file is found, so per-project styles still take precedence.
+    formatters = {
+      ['clang-format'] = {
+        prepend_args = { '--fallback-style=Mozilla' },
+      },
+      -- One argument per line (favour-expansion) for clean, line-oriented diffs --
+      -- matches the Mozilla clang-format philosophy. A project's .gersemirc overrides.
+      gersemi = {
+        prepend_args = { '--list-expansion', 'favour-expansion' },
+      },
     },
   }
 
