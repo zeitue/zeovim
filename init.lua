@@ -681,6 +681,11 @@ do
       --  For example, in C this would take you to the header.
       map('grD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
+      -- VS Code-style Ctrl+Click to jump to definition.
+      --  The leading <LeftMouse> moves the cursor to the click position first,
+      --  then the LSP definition jump runs. Use <C-o> to jump back.
+      map('<C-LeftMouse>', '<LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>', '[G]oto Definition (Ctrl+Click)')
+
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.
       --    See `:help CursorHold` for information about when this is executed
@@ -726,7 +731,12 @@ do
   ---@type table<string, vim.lsp.Config>
   local servers = {
     -- Systems / compiled
-    clangd = {}, -- C / C++
+    clangd = { -- C / C++
+      -- query-driver lets clangd read the cross-compiler's builtin includes
+      -- (arm-zephyr-eabi for Zephyr/nRF), else embedded code shows false errors.
+      -- No effect on native C/C++: it only fires on compilers matching the glob.
+      cmd = { 'clangd', '--query-driver=**/arm-zephyr-eabi-*' },
+    },
     neocmake = {}, -- CMake
     gopls = {}, -- Go
     rust_analyzer = {}, -- Rust
@@ -1064,6 +1074,10 @@ do
     terminal = {
       split_side = 'right',
       split_width_percentage = 0.30,
+      show_native_term_exit_tip = true,
+      auto_close = true,
+      snacks_win_opts = {},
+      env = {},
       provider = 'auto', -- uses snacks.nvim if present, otherwise a native split
     },
   }
