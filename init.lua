@@ -99,7 +99,7 @@ do
   vim.g.maplocalleader = ' '
 
   -- Set to true if you have a Nerd Font installed and selected in the terminal
-  vim.g.have_nerd_font = false
+  vim.g.have_nerd_font = true
 
   -- [[ Setting options ]]
   --  See `:help vim.o`
@@ -166,6 +166,9 @@ do
 
   -- Minimal number of screen lines to keep above and below the cursor.
   vim.o.scrolloff = 10
+
+  -- Vertical ruler lines: 80 (classic limit) and 120 (modern wider limit)
+  vim.o.colorcolumn = '80,120'
 
   -- if performing an operation that would fail due to unsaved changes in the buffer (like `:q`),
   -- instead raise a dialog asking if you wish to save the current file(s)
@@ -413,6 +416,16 @@ do
     styles = {
       comments = {}, -- no italics in comments
     },
+    -- The colorcolumn rulers (80/120) are drawn as a thin vertical line by
+    -- virt-column.nvim, so hide the full-cell `ColorColumn` block and just
+    -- color the line. Palette-aware, so it stays correct across the
+    -- latte/macchiato flip.
+    custom_highlights = function(colors)
+      return {
+        ColorColumn = { bg = 'NONE' }, -- hide the fat block
+        VirtColumn = { fg = colors.surface2 }, -- the thin line
+      }
+    end,
   }
 
   -- Re-apply catppuccin so it picks the flavour for the current `background`.
@@ -438,6 +451,12 @@ do
   -- Highlight todo, notes, etc in comments
   vim.pack.add { gh 'folke/todo-comments.nvim' }
   require('todo-comments').setup { signs = false }
+
+  -- Draw the colorcolumn rulers (80/120) as a thin vertical line instead of a
+  -- full-cell background block. Reads the `colorcolumn` option for placement;
+  -- the line uses the `VirtColumn` highlight set in the catppuccin config above.
+  vim.pack.add { gh 'lukas-reineke/virt-column.nvim' }
+  require('virt-column').setup { char = '▏' }
 
   -- [[ mini.nvim ]]
   --  A collection of various small independent plugins/modules
