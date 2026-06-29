@@ -1195,7 +1195,48 @@ do
 end
 
 -- ============================================================
--- SECTION 13: OPTIONAL EXAMPLES / NEXT STEPS
+-- SECTION 13: TERMINAL (toggleterm)
+-- VS Code-style integrated terminal. Toggle with <C-\> (works from
+-- normal OR terminal mode). Leader bindings under [T]oggle pick the
+-- layout: <leader>tt bottom split, <leader>tf float, <leader>tv side.
+-- Inside a toggleterm, <C-h/j/k/l> jump straight to a code window;
+-- <Esc><Esc> drops to normal mode (mapped in SECTION 1).
+-- ============================================================
+do
+  vim.pack.add { gh 'akinsho/toggleterm.nvim' }
+
+  require('toggleterm').setup {
+    open_mapping = [[<c-\>]], -- one key toggles the last-used terminal
+    direction = 'horizontal', -- default: bottom split, like VS Code's panel
+    size = 15,
+    start_in_insert = true,
+    persist_mode = false, -- always reopen ready to type
+    shade_terminals = true,
+    float_opts = { border = 'curved' },
+  }
+
+  -- Inside toggleterm buffers, let <C-h/j/k/l> escape to code windows
+  -- without first leaving terminal mode.
+  vim.api.nvim_create_autocmd('TermOpen', {
+    pattern = 'term://*toggleterm#*',
+    callback = function(ev)
+      local opts = { buffer = ev.buf }
+      vim.keymap.set('t', '<C-h>', [[<Cmd>wincmd h<CR>]], opts)
+      vim.keymap.set('t', '<C-j>', [[<Cmd>wincmd j<CR>]], opts)
+      vim.keymap.set('t', '<C-k>', [[<Cmd>wincmd k<CR>]], opts)
+      vim.keymap.set('t', '<C-l>', [[<Cmd>wincmd l<CR>]], opts)
+    end,
+  })
+
+  -- Dedicated terminals so each layout is independent and stays put:
+  -- id 1 = bottom split, id 2 = float, id 3 = vertical. <C-\> toggles id 1.
+  vim.keymap.set('n', '<leader>tt', '<cmd>1ToggleTerm direction=horizontal size=15<cr>', { desc = '[T]erminal: toggle (bottom)' })
+  vim.keymap.set('n', '<leader>tf', '<cmd>2ToggleTerm direction=float<cr>', { desc = '[T]erminal: [F]loat' })
+  vim.keymap.set('n', '<leader>tv', '<cmd>3ToggleTerm direction=vertical size=80<cr>', { desc = '[T]erminal: [V]ertical' })
+end
+
+-- ============================================================
+-- SECTION 14: OPTIONAL EXAMPLES / NEXT STEPS
 -- kickstart.plugins.* examples
 -- ============================================================
 do
