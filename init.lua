@@ -266,6 +266,14 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- [[ Filetype detection ]]
+  vim.filetype.add {
+    extension = {
+      j2 = 'jinja',
+      jinja2 = 'jinja',
+    },
+  }
 end
 
 -- ============================================================
@@ -1032,6 +1040,7 @@ do
     'cpp', 'go', 'gomod', 'rust', 'java', 'javascript', 'typescript', 'tsx', 'vue',
     'python', 'ruby', 'perl', 'clojure', 'commonlisp', 'asm',
     'css', 'scss', 'json', 'toml', 'xml', 'yaml',
+    'jinja', 'jinja_inline',
   }
   require('nvim-treesitter').install(parsers)
 
@@ -1090,13 +1099,14 @@ do
   -- Claude Code -- https://github.com/coder/claudecode.nvim
   vim.pack.add { gh 'coder/claudecode.nvim' }
   require('claudecode').setup {
+    env = {},
+    ---@diagnostic disable-next-line: missing-fields
     terminal = {
       split_side = 'right',
       split_width_percentage = 0.30,
       show_native_term_exit_tip = true,
       auto_close = true,
       snacks_win_opts = {},
-      env = {},
       provider = 'auto', -- uses snacks.nvim if present, otherwise a native split
     },
   }
@@ -1158,6 +1168,7 @@ do
   require('neo-tree').setup {
     filesystem = {
       follow_current_file = { enabled = true }, -- highlight the open file in the tree
+      use_libuv_file_watcher = true, -- auto-refresh on external file changes
       window = { mappings = { ['\\'] = 'close_window' } },
     },
   }
