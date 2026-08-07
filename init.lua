@@ -224,7 +224,12 @@ do
     },
   }
 
-  vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+  vim.keymap.set(
+    'n',
+    '<leader>q',
+    vim.diagnostic.setloclist,
+    { desc = 'Open diagnostic [Q]uickfix list' }
+  )
 
   -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
   -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -329,7 +334,9 @@ do
       end
 
       if name == 'LuaSnip' then
-        if vim.fn.has 'win32' ~= 1 and vim.fn.executable 'make' == 1 then run_build(name, { 'make', 'install_jsregexp' }, ev.data.path) end
+        if vim.fn.has 'win32' ~= 1 and vim.fn.executable 'make' == 1 then
+          run_build(name, { 'make', 'install_jsregexp' }, ev.data.path)
+        end
         return
       end
 
@@ -544,7 +551,9 @@ do
     gh 'nvim-telescope/telescope.nvim',
     gh 'nvim-telescope/telescope-ui-select.nvim',
   }
-  if vim.fn.executable 'make' == 1 then table.insert(telescope_plugins, gh 'nvim-telescope/telescope-fzf-native.nvim') end
+  if vim.fn.executable 'make' == 1 then
+    table.insert(telescope_plugins, gh 'nvim-telescope/telescope-fzf-native.nvim')
+  end
 
   -- NOTE: You can install multiple plugins at once
   vim.pack.add(telescope_plugins)
@@ -575,11 +584,21 @@ do
   vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
   vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
   vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
-  vim.keymap.set({ 'n', 'v' }, '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+  vim.keymap.set(
+    { 'n', 'v' },
+    '<leader>sw',
+    builtin.grep_string,
+    { desc = '[S]earch current [W]ord' }
+  )
   vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
   vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
   vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
-  vim.keymap.set('n', '<leader>s.', builtin.oldfiles, { desc = '[S]earch Recent Files ("." for repeat)' })
+  vim.keymap.set(
+    'n',
+    '<leader>s.',
+    builtin.oldfiles,
+    { desc = '[S]earch Recent Files ("." for repeat)' }
+  )
   vim.keymap.set('n', '<leader>sc', builtin.commands, { desc = '[S]earch [C]ommands' })
   vim.keymap.set('n', '<leader><leader>', builtin.buffers, { desc = '[ ] Find existing buffers' })
 
@@ -591,29 +610,59 @@ do
       local buf = event.buf
 
       -- Find references for the word under your cursor.
-      vim.keymap.set('n', 'grr', builtin.lsp_references, { buffer = buf, desc = '[G]oto [R]eferences' })
+      vim.keymap.set(
+        'n',
+        'grr',
+        builtin.lsp_references,
+        { buffer = buf, desc = '[G]oto [R]eferences' }
+      )
 
       -- Jump to the implementation of the word under your cursor.
       -- Useful when your language has ways of declaring types without an actual implementation.
-      vim.keymap.set('n', 'gri', builtin.lsp_implementations, { buffer = buf, desc = '[G]oto [I]mplementation' })
+      vim.keymap.set(
+        'n',
+        'gri',
+        builtin.lsp_implementations,
+        { buffer = buf, desc = '[G]oto [I]mplementation' }
+      )
 
       -- Jump to the definition of the word under your cursor.
       -- This is where a variable was first declared, or where a function is defined, etc.
       -- To jump back, press <C-t>.
-      vim.keymap.set('n', 'grd', builtin.lsp_definitions, { buffer = buf, desc = '[G]oto [D]efinition' })
+      vim.keymap.set(
+        'n',
+        'grd',
+        builtin.lsp_definitions,
+        { buffer = buf, desc = '[G]oto [D]efinition' }
+      )
 
       -- Fuzzy find all the symbols in your current document.
       -- Symbols are things like variables, functions, types, etc.
-      vim.keymap.set('n', 'gO', builtin.lsp_document_symbols, { buffer = buf, desc = 'Open Document Symbols' })
+      vim.keymap.set(
+        'n',
+        'gO',
+        builtin.lsp_document_symbols,
+        { buffer = buf, desc = 'Open Document Symbols' }
+      )
 
       -- Fuzzy find all the symbols in your current workspace.
       -- Similar to document symbols, except searches over your entire project.
-      vim.keymap.set('n', 'gW', builtin.lsp_dynamic_workspace_symbols, { buffer = buf, desc = 'Open Workspace Symbols' })
+      vim.keymap.set(
+        'n',
+        'gW',
+        builtin.lsp_dynamic_workspace_symbols,
+        { buffer = buf, desc = 'Open Workspace Symbols' }
+      )
 
       -- Jump to the type of the word under your cursor.
       -- Useful when you're not sure what type a variable is and you want to see
       -- the definition of its *type*, not where it was *defined*.
-      vim.keymap.set('n', 'grt', builtin.lsp_type_definitions, { buffer = buf, desc = '[G]oto [T]ype Definition' })
+      vim.keymap.set(
+        'n',
+        'grt',
+        builtin.lsp_type_definitions,
+        { buffer = buf, desc = '[G]oto [T]ype Definition' }
+      )
     end,
   })
 
@@ -641,7 +690,12 @@ do
   )
 
   -- Shortcut for searching your Neovim configuration files
-  vim.keymap.set('n', '<leader>sn', function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end, { desc = '[S]earch [N]eovim files' })
+  vim.keymap.set(
+    'n',
+    '<leader>sn',
+    function() builtin.find_files { cwd = vim.fn.stdpath 'config' } end,
+    { desc = '[S]earch [N]eovim files' }
+  )
 end
 
 -- ============================================================
@@ -711,7 +765,11 @@ do
       -- VS Code-style Ctrl+Click to jump to definition.
       --  The leading <LeftMouse> moves the cursor to the click position first,
       --  then the LSP definition jump runs. Use <C-o> to jump back.
-      map('<C-LeftMouse>', '<LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>', '[G]oto Definition (Ctrl+Click)')
+      map(
+        '<C-LeftMouse>',
+        '<LeftMouse><cmd>lua vim.lsp.buf.definition()<CR>',
+        '[G]oto Definition (Ctrl+Click)'
+      )
 
       -- The following two autocommands are used to highlight references of the
       -- word under your cursor when your cursor rests there for a little while.
@@ -720,7 +778,8 @@ do
       -- When you move your cursor, the highlights will be cleared (the second autocommand).
       local client = vim.lsp.get_client_by_id(event.data.client_id)
       if client and client:supports_method('textDocument/documentHighlight', event.buf) then
-        local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+        local highlight_augroup =
+          vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
         vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
           buffer = event.buf,
           group = highlight_augroup,
@@ -747,7 +806,13 @@ do
       --
       -- This may be unwanted, since they displace some of your code
       if client and client:supports_method('textDocument/inlayHint', event.buf) then
-        map('<leader>th', function() vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf }) end, '[T]oggle Inlay [H]ints')
+        map(
+          '<leader>th',
+          function()
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
+          end,
+          '[T]oggle Inlay [H]ints'
+        )
       end
     end,
   })
@@ -765,14 +830,20 @@ do
       cmd = { 'clangd', '--query-driver=**/arm-zephyr-eabi-*' },
     },
     neocmake = {}, -- CMake
-    gopls = {}, -- Go
+    gopls = { -- Go
+      settings = { gopls = { gofumpt = true } },
+    },
+    templ = {}, -- templ (https://templ.guide) -- Go HTML templating
     rust_analyzer = {}, -- Rust
     jdtls = {}, -- Java (basic; for deep project support add nvim-jdtls later)
 
     -- Scripting / dynamic
-    pyright = {}, -- Python
+    pyright = {}, -- Python types
+    ruff = {}, -- Python lint + format
     ruby_lsp = {}, -- Ruby
     perlnavigator = {}, -- Perl
+    bashls = {}, -- bash / sh (bundles shellcheck diagnostics)
+    nushell = {}, -- Nushell -- runs `nu --lsp`, so it needs nu on PATH
 
     -- Web: ts_ls runs Vue hybrid mode so it can also handle .vue files
     ts_ls = {
@@ -780,7 +851,8 @@ do
         plugins = {
           {
             name = '@vue/typescript-plugin',
-            location = vim.fn.stdpath 'data' .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
+            location = vim.fn.stdpath 'data'
+              .. '/mason/packages/vue-language-server/node_modules/@vue/language-server',
             languages = { 'vue' },
           },
         },
@@ -798,9 +870,15 @@ do
 
     -- Data / markup
     jsonls = {}, -- JSON
+    yamlls = {}, -- YAML
     taplo = {}, -- TOML
     lemminx = {}, -- XML
     marksman = {}, -- Markdown
+    protols = {}, -- Protobuf / gRPC
+
+    -- Infrastructure
+    terraformls = {}, -- Terraform
+    tflint = {}, -- Terraform linter
 
     -- Assembly: covers x86 / ARM / RISC-V. Other arches (PowerPC, M68k, 68HC11)
     -- fall back to treesitter/syntax highlight only -- no LSP exists for them.
@@ -813,24 +891,30 @@ do
 
         if client.workspace_folders then
           local path = client.workspace_folders[1].name
-          if path ~= vim.fn.stdpath 'config' and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc')) then return end
+          if
+            path ~= vim.fn.stdpath 'config'
+            and (vim.uv.fs_stat(path .. '/.luarc.json') or vim.uv.fs_stat(path .. '/.luarc.jsonc'))
+          then
+            return
+          end
         end
 
-        client.config.settings.Lua = vim.tbl_deep_extend('force', client.config.settings.Lua --[[@as table]], {
-          runtime = {
-            version = 'LuaJIT',
-            path = { 'lua/?.lua', 'lua/?/init.lua' },
-          },
-          workspace = {
-            checkThirdParty = false,
-            -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
-            --  See https://github.com/neovim/nvim-lspconfig/issues/3189
-            library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
-              '${3rd}/luv/library',
-              '${3rd}/busted/library',
-            }),
-          },
-        })
+        client.config.settings.Lua =
+          vim.tbl_deep_extend('force', client.config.settings.Lua --[[@as table]], {
+            runtime = {
+              version = 'LuaJIT',
+              path = { 'lua/?.lua', 'lua/?/init.lua' },
+            },
+            workspace = {
+              checkThirdParty = false,
+              -- NOTE: this is a lot slower and will cause issues when working on your own configuration.
+              --  See https://github.com/neovim/nvim-lspconfig/issues/3189
+              library = vim.tbl_extend('force', vim.api.nvim_get_runtime_file('', true), {
+                '${3rd}/luv/library',
+                '${3rd}/busted/library',
+              }),
+            },
+          })
       end,
       ---@type lspconfig.settings.lua_ls
       settings = {
@@ -858,11 +942,18 @@ do
   --    :Mason
   --
   -- You can press `g?` for help in this menu.
-  local ensure_installed = vim.tbl_keys(servers or {})
+  -- Servers Mason has no package for -- they ship with their own toolchain
+  local mason_skip = { nushell = true } -- provided by the `nu` binary itself
+
+  local ensure_installed = vim.tbl_filter(
+    function(name) return not mason_skip[name] end,
+    vim.tbl_keys(servers or {})
+  )
   vim.list_extend(ensure_installed, {
     'stylua', -- Lua formatter (used by conform)
     'clang-format', -- C / C++ formatter (used by conform; reads project .clang-format)
     'gersemi', -- CMake formatter (used by conform; neocmake's LSP formatter is a no-op)
+    'shfmt', -- shell formatter (used by conform; bashls does not format)
     -- Add other CLI tools you want Mason to manage here, e.g. 'prettier', 'rustfmt'
   })
 
@@ -883,35 +974,29 @@ do
   vim.pack.add { gh 'stevearc/conform.nvim' }
   require('conform').setup {
     notify_on_error = false,
+    -- Format every filetype on save: an external formatter from `formatters_by_ft`
+    -- below when one is configured, otherwise the LSP (see `lsp_format` below).
+    -- Returning nil skips formatting, which is how the kill switch works -- see
+    -- :FormatDisable / :FormatEnable / <leader>ta at the end of this section.
     format_on_save = function(bufnr)
-      -- You can specify filetypes to autoformat on save here:
-      local enabled_filetypes = {
-        c = true,
-        cpp = true,
-        objc = true, -- Objective-C (.m)
-        objcpp = true, -- Objective-C++ (.mm)
-        cuda = true, -- CUDA (.cu/.cuh)
-        cmake = true, -- CMake
-        -- lua = true,
-        -- python = true,
-      }
-      if enabled_filetypes[vim.bo[bufnr].filetype] then
-        return { timeout_ms = 500 }
-      else
-        return nil
-      end
+      if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then return nil end
+      return { timeout_ms = 500 }
     end,
     default_format_opts = {
       lsp_format = 'fallback', -- Use external formatters if configured below, otherwise use LSP formatting. Set to `false` to disable LSP formatting entirely.
     },
     -- You can also specify external formatters in here.
     formatters_by_ft = {
+      lua = { 'stylua' },
       c = { 'clang-format' },
       cpp = { 'clang-format' },
       objc = { 'clang-format' },
       objcpp = { 'clang-format' },
       cuda = { 'clang-format' },
       cmake = { 'gersemi' },
+      sh = { 'shfmt' },
+      python = { 'ruff_format' },
+      templ = { 'templ' },
       -- rust = { 'rustfmt' },
       -- Conform can also run multiple formatters sequentially
       -- python = { "isort", "black" },
@@ -923,6 +1008,8 @@ do
     -- .clang-format (walking up from the file); --fallback-style only applies
     -- when no such file is found, so per-project styles still take precedence.
     formatters = {
+      -- NOTE: no stylua entry -- conform's builtin already passes
+      -- --search-parent-directories, and stylua hard-errors on a duplicate flag.
       ['clang-format'] = {
         prepend_args = { '--fallback-style=Mozilla' },
       },
@@ -934,7 +1021,33 @@ do
     },
   }
 
-  vim.keymap.set({ 'n', 'v' }, '<leader>f', function() require('conform').format { async = true } end, { desc = '[F]ormat buffer' })
+  vim.keymap.set(
+    { 'n', 'v' },
+    '<leader>f',
+    function() require('conform').format { async = true } end,
+    { desc = '[F]ormat buffer' }
+  )
+
+  -- Kill switch for format-on-save. Needed when editing a repo that has no
+  -- formatter config of its own -- otherwise saving one line reformats the whole
+  -- file and buries the real change in the diff. `:FormatDisable!` is buffer-local.
+  vim.api.nvim_create_user_command('FormatDisable', function(args)
+    if args.bang then
+      vim.b.disable_autoformat = true
+    else
+      vim.g.disable_autoformat = true
+    end
+  end, { desc = 'Disable format-on-save (! = this buffer only)', bang = true })
+
+  vim.api.nvim_create_user_command('FormatEnable', function()
+    vim.b.disable_autoformat = false
+    vim.g.disable_autoformat = false
+  end, { desc = 'Re-enable format-on-save' })
+
+  vim.keymap.set('n', '<leader>ta', function()
+    vim.g.disable_autoformat = not vim.g.disable_autoformat
+    vim.notify('Autoformat ' .. (vim.g.disable_autoformat and 'OFF' or 'ON'))
+  end, { desc = '[T]oggle [A]utoformat on save' })
 end
 
 -- ============================================================
@@ -1033,6 +1146,8 @@ do
   vim.pack.add { { src = gh 'nvim-treesitter/nvim-treesitter', version = 'main' } }
 
   -- Ensure basic parsers are installed
+  -- Keep these grouped by category instead of one name per line.
+  -- stylua: ignore
   local parsers = {
     -- core / kickstart defaults
     'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc',
@@ -1041,6 +1156,7 @@ do
     'python', 'ruby', 'perl', 'clojure', 'commonlisp', 'asm',
     'css', 'scss', 'json', 'toml', 'xml', 'yaml',
     'jinja', 'jinja_inline',
+    'cmake', 'templ', 'proto', 'nu', 'terraform', 'hcl',
   }
   require('nvim-treesitter').install(parsers)
 
@@ -1080,7 +1196,9 @@ do
         treesitter_try_attach(buf, language)
       elseif vim.tbl_contains(available_parsers, language) then
         -- If a parser is available in `nvim-treesitter`, auto-install it and enable it after the installation is done
-        require('nvim-treesitter').install(language):await(function() treesitter_try_attach(buf, language) end)
+        require('nvim-treesitter')
+          .install(language)
+          :await(function() treesitter_try_attach(buf, language) end)
       else
         -- Try to enable treesitter features in case the parser exists but is not available from `nvim-treesitter`
         treesitter_try_attach(buf, language)
@@ -1113,10 +1231,25 @@ do
 
   vim.keymap.set('n', '<leader>cc', '<cmd>ClaudeCode<cr>', { desc = 'Claude: toggle' })
   vim.keymap.set('n', '<leader>cf', '<cmd>ClaudeCodeFocus<cr>', { desc = 'Claude: focus' })
-  vim.keymap.set('n', '<leader>cm', '<cmd>ClaudeCodeSelectModel<cr>', { desc = 'Claude: select model' })
-  vim.keymap.set('n', '<leader>cb', '<cmd>ClaudeCodeAdd %<cr>', { desc = 'Claude: add buffer to context' })
+  vim.keymap.set(
+    'n',
+    '<leader>cm',
+    '<cmd>ClaudeCodeSelectModel<cr>',
+    { desc = 'Claude: select model' }
+  )
+  vim.keymap.set(
+    'n',
+    '<leader>cb',
+    '<cmd>ClaudeCodeAdd %<cr>',
+    { desc = 'Claude: add buffer to context' }
+  )
   vim.keymap.set('v', '<leader>cs', '<cmd>ClaudeCodeSend<cr>', { desc = 'Claude: send selection' })
-  vim.keymap.set('n', '<leader>cy', '<cmd>ClaudeCodeDiffAccept<cr>', { desc = 'Claude: accept diff' })
+  vim.keymap.set(
+    'n',
+    '<leader>cy',
+    '<cmd>ClaudeCodeDiffAccept<cr>',
+    { desc = 'Claude: accept diff' }
+  )
   vim.keymap.set('n', '<leader>cn', '<cmd>ClaudeCodeDiffDeny<cr>', { desc = 'Claude: deny diff' })
 
   -- Antigravity / Gemini -- https://github.com/McEazy2700/antigravity-cli.nvim
@@ -1132,11 +1265,31 @@ do
   }
 
   vim.keymap.set('n', '<leader>ac', '<cmd>Antigravity<cr>', { desc = 'Antigravity: toggle' })
-  vim.keymap.set({ 'n', 'v' }, '<leader>aa', '<cmd>AntigravityAsk<cr>', { desc = 'Antigravity: ask' })
+  vim.keymap.set(
+    { 'n', 'v' },
+    '<leader>aa',
+    '<cmd>AntigravityAsk<cr>',
+    { desc = 'Antigravity: ask' }
+  )
   vim.keymap.set('n', '<leader>ar', '<cmd>AntigravityResume<cr>', { desc = 'Antigravity: resume' })
-  vim.keymap.set('n', '<leader>am', '<cmd>AntigravitySelectModel<cr>', { desc = 'Antigravity: select model' })
-  vim.keymap.set('n', '<leader>ay', '<cmd>AntigravityDiffAccept<cr>', { desc = 'Antigravity: accept diff' })
-  vim.keymap.set('n', '<leader>an', '<cmd>AntigravityDiffDeny<cr>', { desc = 'Antigravity: deny diff' })
+  vim.keymap.set(
+    'n',
+    '<leader>am',
+    '<cmd>AntigravitySelectModel<cr>',
+    { desc = 'Antigravity: select model' }
+  )
+  vim.keymap.set(
+    'n',
+    '<leader>ay',
+    '<cmd>AntigravityDiffAccept<cr>',
+    { desc = 'Antigravity: accept diff' }
+  )
+  vim.keymap.set(
+    'n',
+    '<leader>an',
+    '<cmd>AntigravityDiffDeny<cr>',
+    { desc = 'Antigravity: deny diff' }
+  )
 end
 
 -- ============================================================
@@ -1174,7 +1327,12 @@ do
   }
 
   vim.keymap.set('n', '<leader>e', '<cmd>Neotree toggle<cr>', { desc = 'File [E]xplorer toggle' })
-  vim.keymap.set('n', '\\', '<cmd>Neotree reveal<cr>', { desc = 'Reveal file in Neo-tree', silent = true })
+  vim.keymap.set(
+    'n',
+    '\\',
+    '<cmd>Neotree reveal<cr>',
+    { desc = 'Reveal file in Neo-tree', silent = true }
+  )
 end
 
 -- ============================================================
@@ -1201,7 +1359,12 @@ do
   vim.keymap.set('n', '<leader>gp', '<cmd>Neogit pull<cr>', { desc = 'Git: pull' })
   vim.keymap.set('n', '<leader>gP', '<cmd>Neogit push<cr>', { desc = 'Git: push' })
   vim.keymap.set('n', '<leader>gd', '<cmd>DiffviewOpen<cr>', { desc = 'Git: diff working tree' })
-  vim.keymap.set('n', '<leader>gf', '<cmd>DiffviewFileHistory %<cr>', { desc = 'Git: current file history' })
+  vim.keymap.set(
+    'n',
+    '<leader>gf',
+    '<cmd>DiffviewFileHistory %<cr>',
+    { desc = 'Git: current file history' }
+  )
   vim.keymap.set('n', '<leader>gx', '<cmd>DiffviewClose<cr>', { desc = 'Git: close diffview' })
 end
 
@@ -1241,9 +1404,24 @@ do
 
   -- Dedicated terminals so each layout is independent and stays put:
   -- id 1 = bottom split, id 2 = float, id 3 = vertical. <C-\> toggles id 1.
-  vim.keymap.set('n', '<leader>tt', '<cmd>1ToggleTerm direction=horizontal size=15<cr>', { desc = '[T]erminal: toggle (bottom)' })
-  vim.keymap.set('n', '<leader>tf', '<cmd>2ToggleTerm direction=float<cr>', { desc = '[T]erminal: [F]loat' })
-  vim.keymap.set('n', '<leader>tv', '<cmd>3ToggleTerm direction=vertical size=80<cr>', { desc = '[T]erminal: [V]ertical' })
+  vim.keymap.set(
+    'n',
+    '<leader>tt',
+    '<cmd>1ToggleTerm direction=horizontal size=15<cr>',
+    { desc = '[T]erminal: toggle (bottom)' }
+  )
+  vim.keymap.set(
+    'n',
+    '<leader>tf',
+    '<cmd>2ToggleTerm direction=float<cr>',
+    { desc = '[T]erminal: [F]loat' }
+  )
+  vim.keymap.set(
+    'n',
+    '<leader>tv',
+    '<cmd>3ToggleTerm direction=vertical size=80<cr>',
+    { desc = '[T]erminal: [V]ertical' }
+  )
 end
 
 -- ============================================================
