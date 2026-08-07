@@ -326,6 +326,11 @@ do
       ['.*/docker%-compose%..*%.ya?ml'] = 'yaml.docker-compose',
       ['.*/compose%.ya?ml'] = 'yaml.docker-compose',
       ['.*/compose%..*%.ya?ml'] = 'yaml.docker-compose',
+
+      -- Zephyr Kconfig fragments. These are `CONFIG_FOO=y` config files
+      ['.*/prj%.conf'] = 'kconfig',
+      ['.*/prj_.*%.conf'] = 'kconfig',
+      ['.*/boards/.*%.conf'] = 'kconfig',
     },
   }
 
@@ -938,6 +943,11 @@ do
     systemd_lsp = { filetypes = { 'systemd', 'podman' } },
     docker_language_server = {},
 
+    -- Devicetree -- cross-references nodes, phandles and `&label` overrides
+    -- across .dtsi includes. Not in Mason: `cargo install --git
+    -- https://github.com/igor-prusov/dts-lsp`. Kconfig has no language server.
+    dts_lsp = {},
+
     -- Assembly: covers x86 / ARM / RISC-V. Other arches (PowerPC, M68k, 68HC11)
     -- fall back to treesitter/syntax highlight only -- no LSP exists for them.
     asm_lsp = {},
@@ -1001,7 +1011,10 @@ do
   --
   -- You can press `g?` for help in this menu.
   -- Servers Mason has no package for -- they ship with their own toolchain
-  local mason_skip = { nushell = true } -- provided by the `nu` binary itself
+  local mason_skip = {
+    nushell = true, -- provided by the `nu` binary itself
+    dts_lsp = true, -- cargo install, no Mason package
+  }
 
   local ensure_installed = vim.tbl_filter(
     function(name) return not mason_skip[name] end,
@@ -1216,6 +1229,8 @@ do
     'css', 'scss', 'json', 'toml', 'xml', 'yaml',
     'jinja', 'jinja_inline',
     'cmake', 'templ', 'proto', 'nu', 'terraform', 'hcl', 'dockerfile',
+    'sql', 'make', 'powershell', 'awk', 'nix',
+    'devicetree', 'kconfig',
     'ini', -- stands in for systemd unit grammar
   }
   require('nvim-treesitter').install(parsers)
