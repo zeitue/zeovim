@@ -277,8 +277,56 @@ do
     extension = {
       j2 = 'jinja',
       jinja2 = 'jinja',
+      service = 'systemd',
+      socket = 'systemd',
+      timer = 'systemd',
+      mount = 'systemd',
+      automount = 'systemd',
+      swap = 'systemd',
+      target = 'systemd',
+      slice = 'systemd',
+      scope = 'systemd',
+      path = 'systemd',
+      device = 'systemd',
+      container = 'podman',
+      volume = 'podman',
+      network = 'podman',
+      kube = 'podman',
+      build = 'podman',
+      image = 'podman',
+
+      -- `.pod` claimed by Perl POD.
+      -- POD is built from `=command` paragraphs, a quadlet is INI. Ties go to
+      -- Perl, which is what Neovim would have done anyway.
+      pod = function(_, bufnr)
+        for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 20, false)) do
+          if line:match '^=%a' then return 'pod' end
+          if line:match '^%s*%[%a[%w]*%]%s*$' then return 'podman' end
+        end
+        return 'pod'
+      end,
+    },
+    pattern = {
+      -- Ansible. ansible-language-server binds the compound filetype
+      -- `yaml.ansible`, so plain YAML files have to be promoted by location
+      ['.*/playbooks/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/roles/.*/tasks/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/roles/.*/handlers/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/roles/.*/defaults/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/tasks/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/handlers/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/group_vars/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/host_vars/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/molecule/.*/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/playbook%.ya?ml'] = 'yaml.ansible',
+      ['.*/site%.ya?ml'] = 'yaml.ansible',
+      ['.*/inventory/.*%.ya?ml'] = 'yaml.ansible',
     },
   }
+
+  vim.treesitter.language.register('ini', 'systemd')
+  vim.treesitter.language.register('ini', 'podman')
+  vim.treesitter.language.register('yaml', 'yaml.ansible')
 end
 
 -- ============================================================
@@ -879,6 +927,9 @@ do
     -- Infrastructure
     terraformls = {}, -- Terraform
     tflint = {}, -- Terraform linter
+    ansiblels = {}, -- Ansible (binds `yaml.ansible`; runs ansible-lint itself)
+    -- systemd units + Podman quadlets -- https://github.com/JFryy/systemd-lsp
+    systemd_lsp = { filetypes = { 'systemd', 'podman' } },
 
     -- Assembly: covers x86 / ARM / RISC-V. Other arches (PowerPC, M68k, 68HC11)
     -- fall back to treesitter/syntax highlight only -- no LSP exists for them.
@@ -954,6 +1005,7 @@ do
     'clang-format', -- C / C++ formatter (used by conform; reads project .clang-format)
     'gersemi', -- CMake formatter (used by conform; neocmake's LSP formatter is a no-op)
     'shfmt', -- shell formatter (used by conform; bashls does not format)
+    'ansible-lint', -- Ansible linter (invoked by ansiblels, not by conform)
     -- Add other CLI tools you want Mason to manage here, e.g. 'prettier', 'rustfmt'
   })
 
@@ -1157,6 +1209,7 @@ do
     'css', 'scss', 'json', 'toml', 'xml', 'yaml',
     'jinja', 'jinja_inline',
     'cmake', 'templ', 'proto', 'nu', 'terraform', 'hcl',
+    'ini', -- stands in for systemd unit grammar
   }
   require('nvim-treesitter').install(parsers)
 
