@@ -277,6 +277,7 @@ do
     extension = {
       j2 = 'jinja',
       jinja2 = 'jinja',
+      containerfile = 'dockerfile',
       service = 'systemd',
       socket = 'systemd',
       timer = 'systemd',
@@ -321,12 +322,17 @@ do
       ['.*/playbook%.ya?ml'] = 'yaml.ansible',
       ['.*/site%.ya?ml'] = 'yaml.ansible',
       ['.*/inventory/.*%.ya?ml'] = 'yaml.ansible',
+      ['.*/docker%-compose%.ya?ml'] = 'yaml.docker-compose',
+      ['.*/docker%-compose%..*%.ya?ml'] = 'yaml.docker-compose',
+      ['.*/compose%.ya?ml'] = 'yaml.docker-compose',
+      ['.*/compose%..*%.ya?ml'] = 'yaml.docker-compose',
     },
   }
 
   vim.treesitter.language.register('ini', 'systemd')
   vim.treesitter.language.register('ini', 'podman')
   vim.treesitter.language.register('yaml', 'yaml.ansible')
+  vim.treesitter.language.register('yaml', 'yaml.docker-compose')
 end
 
 -- ============================================================
@@ -930,6 +936,7 @@ do
     ansiblels = {}, -- Ansible (binds `yaml.ansible`; runs ansible-lint itself)
     -- systemd units + Podman quadlets -- https://github.com/JFryy/systemd-lsp
     systemd_lsp = { filetypes = { 'systemd', 'podman' } },
+    docker_language_server = {},
 
     -- Assembly: covers x86 / ARM / RISC-V. Other arches (PowerPC, M68k, 68HC11)
     -- fall back to treesitter/syntax highlight only -- no LSP exists for them.
@@ -1208,7 +1215,7 @@ do
     'python', 'ruby', 'perl', 'clojure', 'commonlisp', 'asm',
     'css', 'scss', 'json', 'toml', 'xml', 'yaml',
     'jinja', 'jinja_inline',
-    'cmake', 'templ', 'proto', 'nu', 'terraform', 'hcl',
+    'cmake', 'templ', 'proto', 'nu', 'terraform', 'hcl', 'dockerfile',
     'ini', -- stands in for systemd unit grammar
   }
   require('nvim-treesitter').install(parsers)
